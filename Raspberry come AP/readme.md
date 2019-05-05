@@ -20,10 +20,12 @@ A questo punto ci basta collegare il Raspberry alla rete e sarà possibile colle
 
 ![Connessione ssh](Immagini/Connessione_ssh.png)
 
-Prima di passare alla configurazione dell'access point possiamo madificare le impostazioni con ```sudo raspi-config```: ad esempio la password e il nome di rete del Raspberry, il fuso orario. Il Raspberry potrebbe chiedere di riavviarsi.
+Prima di passare alla configurazione dell'access point possiamo madificare le impostazioni con ```sudo raspi-config```: ad esempio la password e il nome di rete del Raspberry. Il Raspberry potrebbe chiedere di riavviarsi.
 Aggiornare anche i software alle ultime loro versioni:
 
-```sudo apt update``` e ```sudo apt upgrade```
+```sudo apt update```
+
+```sudo apt upgrade```
 
 ![Configurazione base Raspberry](Immagini/Configurazione_base_Raspberry.png)
 
@@ -42,10 +44,13 @@ Procedere quindi alla loro installazione:
 
 ### Configurare un indirizzo IP statico
 
-Il raspberry avrà bisogno di un indirizzo IP statico per funzionare come gateway nella rete WiFi che creeremo. Per impostarlo modifichiamo la configurazione DHCP. Quindi tramite ```sudo nano /etc/dhcpcd.conf``` impostiamo un indirizzo statico aggiungendo in fondo al file il seguente codice (cambiando l'ip a proprio piacimento):
+Il raspberry avrà bisogno di un indirizzo IP statico per funzionare come gateway nella rete WiFi che creeremo. Per impostarlo modifichiamo la configurazione DHCP. Impostiamo un indirizzo statico aggiungendo in fondo al file il seguente codice (cambiando l'ip a proprio piacimento):
+
+```sudo nano /etc/dhcpcd.conf```
+
 ```
 interface wlan0
-    static ip_address=192.168.10.1/24
+    static ip_address=192.168.4.1/24
     nohook wpa_supplicant
 ```
 
@@ -67,7 +72,7 @@ sudo nano /etc/dnsmasq.conf
 Impostiamo quindi dnsmasq specificando l'interfaccia che vogliamo utilizzare (nel nostro caso quella wireless), il range di indirizzi disponibili, la subnet e il tempo di lease:
 
 ```
-interface=wlan0      # Use the require wireless interface - usually wlan0
+interface=wlan0      #Utilizziamo l'interfaccia wireless wlan0
 dhcp-range=192.168.4.2,192.168.4.20,255.255.255.0,24h
 ```
 
@@ -132,8 +137,12 @@ DAEMON_CONF="/etc/hostapd/hostapd.conf"
 
 Ora che abbiamo configurato tutto passiamo all'avvio di hostapd con i seguenti comandi:
 
-```
-sudo systemctl unmask hostapd
-sudo systemctl enable hostapd
-sudo systemctl start hostapd
-```
+```sudo service hostapd start```
+
+```sudo service dnsmasq start```
+
+```sudo reboot```
+
+## Impostazione WPA2-E con server RADIUS
+
+Se vogliamo utilizzare un server RADIUS per l'autenticazione degli utenti dobbiamo modificare la configurazione di hostapd:
