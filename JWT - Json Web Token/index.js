@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken')
 
 const app = express()
 
+app.use('/', express.static('website'))
+
 app.get('/api', (req, res) => {
     res.json({
         messaggio: 'Benvenuto'
